@@ -47,11 +47,13 @@ class HelperAgent:
         logger.info("Initializing agent")
         self.mode: Literal["offline", "online"] = os.getenv("AGENT_MODE", "offline")
         self.llm = self._build_llm()
-        if self.mode == "offline" and not Path("vectorstore/chroma").exists():
-            raise RuntimeError(
-                "Offline mode requires a built vectorstore. "
-                "Run `python scripts/ingest_docs.py` first."
-            )
+        if self.mode == "offline":
+            vs_path = Path("vectorstore/chroma")
+            if not vs_path.exists() or not any(vs_path.iterdir()):
+                raise RuntimeError(
+                    "Offline mode requires a built vectorstore. "
+                    "Run `python scripts/ingest_docs.py` first."
+                )
 
         self._setup_retriever()
         self.tools = []

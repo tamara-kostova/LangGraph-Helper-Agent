@@ -1,9 +1,9 @@
 # 🔗 **LangGraph Helper Agent** 
 *AI-powered coding assistant for LangGraph & LangChain developers*
 
-[![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](http://localhost:8501)
-[![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)](http://localhost:8000/docs)
-[![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://hub.docker.com)
+[![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
+[![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 
 **Dual-mode agent** that answers practical LangGraph/LangChain questions using **offline RAG** (local docs) or **online search** (Tavily)
 with **FastAPI API + Streamlit UI**.
@@ -74,8 +74,11 @@ User Query → LangChain Agent → Tavily Search → Reasoning Loop → Answer
 
 ### **Mode Switching**
 Streamlit: Sidebar dropdown + "Switch Mode" → Cache clear → New agent
+
 FastAPI: AGENT_MODE=offline|online env var
+
 Docker: -e AGENT_MODE=online
+
 CLI: export AGENT_MODE=online
 
 ## **Data Freshness Strategy**
@@ -116,7 +119,9 @@ Note: the refreshed data will be used by newly initialized agents.
 Clone & install
 
 `git clone <https://github.com/tamara-kostova/LangGraph-Helper-Agent.git>`
+
 `pip install -r requirements.txt`
+
 .env
 
 `echo GEMINI_API_KEY=your_key > .env`
@@ -135,6 +140,7 @@ API
 Build (multi-stage, pre-built wheels)
 
 `docker build -t langgraph-helper .`
+
 Run UI
 
 `docker run -p 8501:8501 -e GEMINI_API_KEY=your_key langgraph-helper streamlit run streamlit_app.py`
@@ -146,6 +152,7 @@ Run API
 
 ### **Health Check**
 `curl http://localhost:8000/health`
+
 {"status": "healthy", "mode": "offline"}
 
 

@@ -9,18 +9,24 @@
 with **FastAPI API + Streamlit UI**.
 
 ## **Quick Start**
-**Online**:
 
-set up the .env file with `GEMINI_API_KEY` and `TAVILY_API_KEY`
+### Prerequisites
+Create a `.env` file with your API keys:
+```bash
+GEMINI_API_KEY=your_gemini_key        # Required for both modes
+TAVILY_API_KEY=your_tavily_key        # Required for online mode only
+```
+
+### **Online Mode**
 ```bash
 pip install -r requirements.txt
 streamlit run streamlit_app.py
 ```
 
-**Offline**:
+### **Offline Mode**
 ```bash
 pip install -r requirements.txt
-python scripts/ingest_docs.py
+python scripts/ingest_docs.py          # Build vectorstore (one-time setup)
 streamlit run streamlit_app.py
 ```
 ## **Architecture Overview**
@@ -107,47 +113,118 @@ and vectorstore rebuild.
 
 Note: the refreshed data will be used by newly initialized agents.
 
-## API Keys (free)
+## **API Keys** (Free Tier)
 
-    Gemini: [aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey) → GEMINI_API_KEY
+### Required for Both Modes
+- **Gemini API**: [Google AI Studio](https://aistudio.google.com/app/apikey)
+  - Set as `GEMINI_API_KEY` in `.env`
+  - Free tier: 1500 requests/day (Gemini 2.5 Flash Lite)
 
-    Tavily: [app.tavily.com](https://app.tavily.com) → TAVILY_API_KEY (online mode)
+### Required for Online Mode Only
+- **Tavily Search**: [Tavily Dashboard](https://app.tavily.com)
+  - Set as `TAVILY_API_KEY` in `.env`
+  - Free tier: 1000 searches/month
 
 
 ## **Local Setup**
 
-Clone & install
+### Clone Repository
+```bash
+git clone https://github.com/tamara-kostova/LangGraph-Helper-Agent.git
+cd LangGraph-Helper-Agent
+```
 
-`git clone <https://github.com/tamara-kostova/LangGraph-Helper-Agent.git>`
+### Install Dependencies
+```bash
+pip install -r requirements.txt
+```
 
-`pip install -r requirements.txt`
+### Setup Environment Variables
+```bash
+echo "GEMINI_API_KEY=your_key" > .env
+echo "TAVILY_API_KEY=your_key" >> .env
+```
 
-.env
+### Build Vectorstore (Required for Offline Mode)
+```bash
+python scripts/ingest_docs.py
+```
 
-`echo GEMINI_API_KEY=your_key > .env`
+### Run Application
 
-`echo TAVILY_API_KEY=your_key > /env`
+**Streamlit UI (Recommended)**
+```bash
+streamlit run streamlit_app.py
+```
 
-UI (recommended)
-
-`streamlit run streamlit_app.py`
-
-API
-
-`uvicorn main:app --reload`
+**FastAPI Server**
+```bash
+uvicorn main:app --reload
+```
 
 ### **Docker**
-Build (multi-stage, pre-built wheels)
 
-`docker build -t langgraph-helper .`
+#### Build Image
+**Note**: Initial build takes **5-10 minutes** as it:
+1. Installs all Python dependencies
+2. Downloads LangGraph/LangChain documentation (7MB)
+3. Builds the Chroma vectorstore with embeddings
 
-Run UI
+```bash
+docker build -t langgraph-helper .
+```
 
-`docker run -p 8501:8501 -e GEMINI_API_KEY=your_key langgraph-helper streamlit run streamlit_app.py`
+The image is **ready-to-run** with the vectorstore pre-built for offline mode.
 
-Run API
+#### Run Containers
 
-`docker run -p 8000:8000 -e AGENT_MODE=online -e GEMINI_API_KEY=your_key langgraph-helper uvicorn main:app`
+**Using Environment File (Recommended)**
+
+Create a `.env` file with your configuration (see Setup Environment Variables above), then:
+
+**Streamlit UI**
+```bash
+docker run --env-file .env -p 8501:8501 langgraph-helper streamlit run streamlit_app.py
+```
+
+**FastAPI Server**
+```bash
+docker run --env-file .env -p 8000:8000 langgraph-helper
+```
+
+**Using Individual Environment Variables**
+
+**Streamlit UI (Offline Mode)**
+```bash
+docker run -p 8501:8501 \
+  -e GEMINI_API_KEY=your_key \
+  langgraph-helper streamlit run streamlit_app.py
+```
+
+**FastAPI Server (Offline Mode)**
+```bash
+docker run -p 8000:8000 \
+  -e GEMINI_API_KEY=your_key \
+  langgraph-helper
+```
+
+**FastAPI Server (Online Mode)**
+```bash
+docker run -p 8000:8000 \
+  -e AGENT_MODE=online \
+  -e GEMINI_API_KEY=your_key \
+  -e TAVILY_API_KEY=your_key \
+  langgraph-helper
+```
+
+**Streamlit UI (Online Mode)**
+```bash
+docker run -p 8501:8501 \
+  -e AGENT_MODE=online \
+  -e GEMINI_API_KEY=your_key \
+  -e TAVILY_API_KEY=your_key \
+  langgraph-helper streamlit run streamlit_app.py
+```
 
 
 ### **Health Check**
@@ -157,10 +234,11 @@ Run API
 
 
 ## **Tech Stack**
-- Backend: FastAPI + LangGraph + LangChain V1
-- Vector DB: Chroma
-- Embeddings: all-MiniLM-L6-v2
-- LLM: Gemini 2.0 Flash / OpenRouter
-- Tools: Tavily Search
-- UI: Streamlit
-- Container: Docker (multi-stage)
+- **Backend**: FastAPI + LangGraph + LangChain V1
+- **Vector DB**: Chroma (persistent, disk-based)
+- **Embeddings**: `sentence-transformers/all-MiniLM-L6-v2` (384-dim, local)
+- **LLM**: Google Gemini 2.5 Flash Lite (configurable: Gemini/OpenRouter)
+- **Search Tools**: Tavily Search API (online mode)
+- **UI**: Streamlit with live mode switching
+- **Container**: Docker multi-stage build (optimized for size)
+- **Scheduler**: APScheduler (automated data refresh)

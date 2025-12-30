@@ -1,0 +1,39 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation images
+*.png
+*.jpg
+*.jpeg
+
+# Vector store (will be rebuilt)
+vectorstore/
+
+# Env files
+.env
+.env.example
+
+# Assignment
+assignment.txt

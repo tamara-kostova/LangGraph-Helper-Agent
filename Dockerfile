@@ -10,12 +10,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt --only-binary=all && \
+    pip install --no-cache-dir -r requirements.txt && \
     pip cache purge
 
 FROM python:3.11-slim
 
 WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
@@ -29,6 +33,8 @@ RUN if [ ! -f data/langgraph-llms.txt ]; then \
     curl -o data/langchain-llms.txt https://docs.langchain.com/llms.txt && \
     curl -o data/langchain-llms-full.txt https://docs.langchain.com/llms-full.txt; \
     fi
+
+RUN python -m scripts.ingest_docs
 
 ENV PYTHONUNBUFFERED=1 \
     AGENT_MODE=offline

@@ -141,7 +141,7 @@ class HelperAgent:
         agent = create_agent(self.llm, self.tools, system_prompt=system_prompt)
 
         result = agent.invoke({"messages": state["messages"]})
-        logger.info(f"Agent with tools answer: {result["messages"]}")
+        logger.info(f"Agent with tools answer: {result['messages']}")
 
         return {
             "messages": result["messages"],

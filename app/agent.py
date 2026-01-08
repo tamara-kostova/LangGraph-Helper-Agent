@@ -67,13 +67,13 @@ class HelperAgent:
         if provider == "gemini":
             return ChatGoogleGenerativeAI(
                 model=model,
-                api_key=os.getenv("GOOGLE_API_KEY"),
+                api_key=settings.GOOGLE_API_KEY,
                 temperature=0.2,
             )
         elif provider == "openrouter":
             return ChatOpenAI(
-                model=model,
-                api_key=os.getenv("OPENROUTER_API_KEY"),
+                model=settings.OPENROUTER_MODEL_NAME,
+                api_key=settings.OPENROUTER_API_KEY,
                 base_url="https://openrouter.ai/api/v1",
                 temperature=0.2,
             )
